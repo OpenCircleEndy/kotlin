@@ -5,18 +5,14 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
-fun main() {
-    val spiderMonkey = Executors.newFixedThreadPool(2)
+fun main() = with(Executors.newFixedThreadPool(2)) {
 
-    measureTimeMillis { getDataUsingThreads(spiderMonkey) }.let { "Execution time using Threads: $it ms.".println() }
-    "".println()
-    measureTimeMillis { getDataUsingCoroutines(spiderMonkey) }.let { "Execution time using Coroutines: $it ms.".println() }
+    measureTimeMillis { getDataUsingThreads(this) }.printExecutionTime("Threads")
 
-    spiderMonkey.shutdown()
-    spiderMonkey.awaitTermination(5L, TimeUnit.SECONDS)
+    measureTimeMillis { getDataUsingCoroutines(this) }.printExecutionTime("Coroutines")
+
+    this.shutdownAndAwaitTermination()
 }
-
-private fun String.println() = System.out.println(this)
 
 private fun getDataUsingThreads(executorService: ExecutorService) = executorService.submit {
     "Getting data...".println()
@@ -49,3 +45,13 @@ private suspend fun findQualityScenesAsync(movie: String): List<String> = "Find 
     .also { delay(2_000) }
     .also { "Returning all quality scenes from $movie".println() }
     .let { listOf() }
+
+private fun String.println() = System.out.println(this)
+
+private fun Long.printExecutionTime(subject: String) = "Execution time using $subject: $this ms.\n".println()
+
+private fun ExecutorService.shutdownAndAwaitTermination() {
+    shutdown()
+    awaitTermination(5L, TimeUnit.SECONDS)
+}
+
