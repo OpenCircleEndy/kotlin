@@ -46,7 +46,7 @@ private suspend fun findQualityScenesAsync(movie: String): List<String> = "Find 
     .also { "Returning all quality scenes from $movie".println() }
     .let { listOf() }
 
-private fun String.println() = System.out.println(this)
+private fun String.println() = println(this)
 
 private fun Long.printExecutionTime(subject: String) = "Execution time using $subject: $this ms.\n".println()
 
